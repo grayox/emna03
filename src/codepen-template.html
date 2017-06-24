@@ -1,0 +1,115 @@
+<!---- >
+Glitch: https://torpid-sauce.glitch.me
+Glitch: https://aspiring-chauffeur.glitch.me
+Codepen: https://codepen.io/tony19/pen/jmQLyV?editors=1010
+<!---->
+<head>
+  <base href="https://polygit.org/polymer+v2.0.0/shadycss+webcomponents+1.0.0/components/">
+  <script src="webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="polymer/polymer.html">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/progressbar.js/1.0.1/progressbar.min.js"></script>
+</head>
+<body>
+  <progress-bar></progress-bar>
+
+  <dom-module id="progress-bar">
+    <template>
+      <style>
+        :host {
+          display: block;
+          padding: 10 px;
+        }
+        p {
+          font-size: 200 % ;
+          font-family: Roboto, Open Sans, sans-serif;
+        }
+        .label {
+          color: #6FD57F !important;
+          font-size: 300%;
+          font-family: Roboto, Open Sans, sans-serif;
+        }
+        #container {
+          width: 200 px;
+          height: 100 px;
+        }
+      </style>
+
+      <div class="card">
+        <div class="circle">1</div>
+        <div id="container"></div>
+        [[animatePercentage]]
+        <p>1,234 steps</p>
+      </div>
+    </template>
+
+    <script>
+      class MyProgressBar extends Polymer.Element {
+        static get is() {
+          return 'progress-bar';
+        }
+
+        static get properties() {
+          return {
+            animatePercentage: {
+              type: Number,
+              notify: true,
+              value: 0.7,
+            },
+          }
+        }
+
+        constructor() {
+          super();
+        }
+
+        ready() {
+          super.ready();
+          Polymer.RenderStatus.afterNextRender(this, function() {
+            //...
+          });
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+          this.animateCircle('container', this.animatePercentage);
+        }
+
+        animateCircle(containerId, animatePercentage) {
+          var startColor = '#FC5B3F';
+          var endColor = '#6FD57F';
+
+          //var element = this.$[containerId];
+          var element = this.shadowRoot.getElementById(containerId);
+          var circle = new ProgressBar.SemiCircle(element, {
+            color: startColor,
+            trailColor: '#eee',
+            trailWidth: 5,
+            duration: 2000,
+            easing: 'bounce',
+            strokeWidth: 5,
+            text: {
+              value: (animatePercentage * 100) + '%',
+              className: 'label'
+            },
+            // Set default step function for all animate calls
+            step: function(state, circle) {
+              circle.path.setAttribute('stroke', state.color);
+            }
+          });
+
+          circle.animate(animatePercentage, {
+            from: {
+              color: startColor
+            },
+            to: {
+              color: endColor
+            }
+          });
+        }
+
+      }
+
+      window.customElements.define(MyProgressBar.is, MyProgressBar);
+    </script>
+</dom-module>
+</body>

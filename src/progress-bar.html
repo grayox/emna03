@@ -1,0 +1,235 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!---- >
+Original: https://jsfiddle.net/codeandcloud/3znuxaxs/
+Derivative: https://jsfiddle.net/vyy8craL/1/
+Docs: http://progressbarjs.readthedocs.io/en/latest/api/shape/#new-shapecontainer-options
+Image/icon
+OP: https://github.com/kimmobrunfeldt/progressbar.js/issues/64
+Example (on top): http://jsfiddle.net/szev5syq/
+Example (around): http://jsfiddle.net/ror37gjk/2/
+<!---->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="progressbar-js.html">
+
+<dom-module id="progress-bar">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    <style>
+			/** /
+			p {
+				font-size: 200%;
+				font-family: Roboto, Open Sans, sans-serif;  
+			}
+			.label {
+				color: #6FD57F !important;
+				font-size: 300%;
+				font-family: Roboto, Open Sans, sans-serif;
+			}
+			/**/
+			.label {
+				color: grey;
+				line-height: 1.0;
+				/** /x
+				text-align: center;
+				/**/
+			}
+			.line-1 {
+				font-size: 300%;
+				font-weight: 200;
+				/** /x
+				margin-top: 3px;
+				padding-top: 3px;
+				/**/
+			}
+			.line-2 {
+				font-size: 200%;
+				font-weight: 100;
+				opacity: 0.5;
+			}
+			#container {
+				width: 200px;
+				height: 100px;
+			}
+    </style>
+		
+    <style>
+			svg {
+				width: 100%;
+				display: block;
+			}
+
+			.wrapper {
+				position: relative;
+				width: 200px;
+				height: 100px;
+			}
+
+			.wrapper > #container, .wrapper > img, .icon {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 50%;
+			}
+			
+			.icon {
+				color: #29b6f6;
+				width: 50%;
+        top: -25%;
+				left: 25%;
+				height: 200%;
+				/** /
+				--iron-icon: {
+					--iron-icon-width: 72px;
+					--iron-icon-height: 72px;
+				};
+				/**/
+			}
+
+			.wrapper > img, .icon {
+				/* Needs appropriate vendor prefixes */
+				box-sizing: border-box;
+
+				/* This needs to be equal to strokeWidth */
+				padding: 4%;
+			}
+
+			/** /
+			.wrapper > img, .icon {
+				border-radius: 50%;
+			}
+			/**/
+
+    </style>
+    <style>
+			span {
+				font-size: 300%;
+				text-align: center;
+			}
+    </style>
+		
+
+    <div class="card">
+      <div class="wrapper">
+				<!---- >
+				<img src="http://static.iltalehti.fi/terveys/kippari_etu2250612PP_tr.jpg" />
+				<!---->
+				<iron-icon icon="file-upload" class="icon"></iron-icon>
+				<div id="container"></div>
+			</div>
+			<span class="label line-1">1,234</span><br>
+			<span class="label line-2">steps</span>
+		</div>
+		
+		
+  </template>
+
+  <script>
+    class MyProgressBar extends Polymer.Element {
+      static get is() { return 'progress-bar'; }
+
+			static get properties() {
+				return {
+					//the properties you know and love from Polymer
+					animatePercentage: {
+						type: Number,
+						notify: true,
+						//observer: 'animateCircle',
+						value: 0.7,
+					},
+				}
+			}
+
+			// lifecycle callbacks
+			
+			constructor() {
+				super();
+				//console.log('1...constructor logged');
+				//this.animateCircle('container', this.animatePercentage);
+			}
+
+			ready() {
+				super.ready();
+				//console.log('2...ready logged');
+				// When possible, use afterNextRender to defer non-critical work until after first paint.
+				// https://www.polymer-project.org/2.0/docs/devguide/custom-elements#element-lifecycle
+				Polymer.RenderStatus.afterNextRender(this, function() {
+					this.animateCircle('container', this.animatePercentage);
+				});
+			}
+			
+			connectedCallback() {
+				super.connectedCallback();
+				//console.log('3...connectedCallback logged');
+			}
+			
+			// end lifecycle callbacks
+			
+			// methods
+			/**/
+			animateCircle(containerId, animatePercentage) {
+				//console.log('animateCircle logged');
+				//console.log(containerId);
+				//console.log(animatePercentage);
+			  /**/
+				var startColor = '#000';
+				var endColor = '#29b6f6'; // --light-blue-400 // https://www.materialpalette.com/colors
+
+				//var element = document.getElementById(containerId);        do NOT do this
+        //var element = this.shadowRoot.getElementById(containerId); DO THIS
+        var element = this.$[containerId];                        // DO THIS
+				var circle = new ProgressBar.SemiCircle(element, { // Line // Circle // SemiCircle
+						color: endColor,
+						trailColor: '#eee',
+						trailWidth: 9,
+						duration: ( 1000 + Math.round(Math.random() * 1000) + (1000 * animatePercentage) ),
+						easing: 'bounce', //'linear', 'easeIn', 'easeOut', 'easeInOut'
+						strokeWidth: 7,
+					  /** /
+						text: {
+						  value: (animatePercentage*100) + '%',
+						  className: 'label',
+						},
+					  /**/
+						// Set default step function for all animate calls
+						step: function (state, circle) {
+						  circle.path.setAttribute('stroke', state.color);
+						}
+				});
+
+				circle.animate(animatePercentage, {
+					from: {
+						color: startColor
+					},
+					to: {
+						color: endColor
+					}
+				});
+				/**/
+			}
+			/**/
+			
+    }
+
+    window.customElements.define(MyProgressBar.is, MyProgressBar);
+  </script>
+</dom-module>
